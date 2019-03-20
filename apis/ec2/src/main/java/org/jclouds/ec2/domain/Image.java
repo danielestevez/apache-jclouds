@@ -51,7 +51,7 @@ public class Image implements Comparable<Image> {
    private final String kernelId;
    @Nullable
    private final String platform;
-   private final Set<String> productCodes = Sets.newHashSet();
+   private final Set<ProductCode> productCodes = Sets.newHashSet();
    @Nullable
    private final String ramdiskId;
    private final RootDeviceType rootDeviceType;
@@ -73,7 +73,7 @@ public class Image implements Comparable<Image> {
 
    public Image(String region, Architecture architecture, @Nullable String name, @Nullable String description,
             String imageId, String imageLocation, String imageOwnerId, ImageState imageState, String rawState,
-            ImageType imageType, boolean isPublic, Iterable<String> productCodes, @Nullable String kernelId,
+            ImageType imageType, boolean isPublic, @Nullable Iterable<ProductCode> productCodes, @Nullable String kernelId,
             @Nullable String platform, @Nullable String ramdiskId, RootDeviceType rootDeviceType,
             @Nullable String rootDeviceName, Map<String, EbsBlockDevice> ebsBlockDevices,
             Map<String, String> tags, VirtualizationType virtualizationType, Hypervisor hypervisor) {
@@ -91,7 +91,7 @@ public class Image implements Comparable<Image> {
       this.isPublic = isPublic;
       this.kernelId = kernelId;
       this.platform = platform;
-      Iterables.addAll(this.productCodes, checkNotNull(productCodes, "productCodes"));
+      Iterables.addAll(this.productCodes, productCodes);
       this.ramdiskId = ramdiskId;
       this.rootDeviceType = checkNotNull(rootDeviceType, "rootDeviceType");
       this.ebsBlockDevices.putAll(checkNotNull(ebsBlockDevices, "ebsBlockDevices"));
@@ -252,6 +252,32 @@ public class Image implements Comparable<Image> {
 
    }
 
+   public static class ProductCode {
+      @Nullable
+      private final String productCodeId;
+      @Nullable
+      private final String productCodeType;
+
+      public ProductCode(@Nullable String productCodeId, @Nullable String productCodeType) {
+         this.productCodeId = productCodeId;
+         this.productCodeType = productCodeType;
+      }
+
+      public String getProductCodeId() {
+         return productCodeId;
+      }
+
+      public String getProductCodeType() {
+         return productCodeType;
+      }
+
+      @Override
+      public String toString() {
+         return "EbsBlockDevice [productCodeId=" + productCodeId + ", productCodeType=" + productCodeType + "]";
+      }
+
+   }
+
    /**
     * To be removed in jclouds 1.6 <h4>Warning</h4>
     * 
@@ -339,7 +365,7 @@ public class Image implements Comparable<Image> {
    /**
     * Product codes of the AMI.
     */
-   public Set<String> getProductCodes() {
+   public Set<ProductCode> getProductCodes() {
       return productCodes;
    }
 

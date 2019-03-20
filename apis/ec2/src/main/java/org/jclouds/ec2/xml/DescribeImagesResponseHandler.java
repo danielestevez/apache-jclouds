@@ -34,6 +34,7 @@ import org.jclouds.ec2.domain.Image.Architecture;
 import org.jclouds.ec2.domain.Image.EbsBlockDevice;
 import org.jclouds.ec2.domain.Image.ImageState;
 import org.jclouds.ec2.domain.Image.ImageType;
+import org.jclouds.ec2.domain.Image.ProductCode;
 import org.jclouds.ec2.domain.RootDeviceType;
 import org.jclouds.ec2.domain.VirtualizationType;
 import org.jclouds.http.functions.ParseSax;
@@ -77,7 +78,9 @@ public class DescribeImagesResponseHandler extends ParseSax.HandlerForGeneratedR
    private boolean isPublic;
    private String kernelId;
    private String platform;
-   private Set<String> productCodes = Sets.newHashSet();
+   private Set<ProductCode> productCodes = Sets.newHashSet();
+   private String productCodeId;
+   private String productCodeType;
    private String ramdiskId;
    private boolean inProductCodes;
    private boolean inBlockDeviceMapping;
@@ -147,8 +150,10 @@ public class DescribeImagesResponseHandler extends ParseSax.HandlerForGeneratedR
          kernelId = currentText.toString().trim();
       } else if (qName.equals("platform")) {
          platform = currentText.toString().trim();
-      } else if (qName.equals("productCode")) {
-         productCodes.add(currentText.toString().trim());
+      } else if (qName.equals("productCodeId")) {
+         productCodeId = currentText.toString().trim();
+      } else if (qName.equals("productCodeType")) {
+         productCodeType = currentText.toString().trim();
       } else if (qName.equals("productCodes")) {
          inProductCodes = false;
       } else if (qName.equals("blockDeviceMapping")) {
@@ -186,7 +191,10 @@ public class DescribeImagesResponseHandler extends ParseSax.HandlerForGeneratedR
             this.encrypted = false;
             this.volumeType = null;
             this.iops = null;
-         } else if (!inTagSet && !inProductCodes) {
+         } else if (inProductCodes){
+            productCodes.add(new ProductCode(productCodeId,productCodeType));
+         } else
+            if (!inTagSet) {
             try {
                String region = getRequest() != null ? AWSUtils.findRegionInArgsOrNull(getRequest()) : null;
                if (region == null)
