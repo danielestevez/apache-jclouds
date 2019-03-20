@@ -19,14 +19,11 @@ package org.jclouds.ec2.xml;
 import static org.jclouds.util.SaxUtils.currentOrNull;
 import static org.jclouds.util.SaxUtils.equalsOrSuffix;
 
-import javax.annotation.Resource;
-import javax.inject.Inject;
 import java.util.Map;
 import java.util.Set;
+import javax.annotation.Resource;
+import javax.inject.Inject;
 
-import com.google.common.base.Supplier;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import org.jclouds.aws.util.AWSUtils;
 import org.jclouds.ec2.domain.Hypervisor;
 import org.jclouds.ec2.domain.Image;
@@ -40,6 +37,10 @@ import org.jclouds.http.functions.ParseSax;
 import org.jclouds.location.Region;
 import org.jclouds.logging.Logger;
 import org.xml.sax.Attributes;
+
+import com.google.common.base.Supplier;
+import com.google.common.collect.Maps;
+import com.google.common.collect.Sets;
 
 /**
  * Parses the following XML document:
@@ -74,6 +75,7 @@ public class DescribeImagesResponseHandler extends ParseSax.HandlerForGeneratedR
    private ImageState imageState;
    private String rawState;
    private ImageType imageType;
+   private String imageOwnerAlias;
    private boolean isPublic;
    private String kernelId;
    private String platform;
@@ -141,6 +143,8 @@ public class DescribeImagesResponseHandler extends ParseSax.HandlerForGeneratedR
          imageState = ImageState.fromValue(rawState);
       } else if (qName.equals("imageType")) {
          imageType = ImageType.fromValue(currentText.toString().trim());
+      } else if (qName.equals("imageOwnerAlias")) {
+         imageOwnerAlias = currentText.toString().trim();
       } else if (qName.equals("isPublic")) {
          isPublic = Boolean.parseBoolean(currentText.toString().trim());
       } else if (qName.equals("kernelId")) {
@@ -191,9 +195,11 @@ public class DescribeImagesResponseHandler extends ParseSax.HandlerForGeneratedR
                String region = getRequest() != null ? AWSUtils.findRegionInArgsOrNull(getRequest()) : null;
                if (region == null)
                   region = defaultRegion.get();
-               contents.add(new Image(region, architecture, this.name, description, imageId, imageLocation,
-                        imageOwnerId, imageState, rawState, imageType, isPublic, productCodes, kernelId, platform,
-                        ramdiskId, rootDeviceType, rootDeviceName, ebsBlockDevices, tags, virtualizationType, hypervisor));
+               contents
+                     .add(new Image(region, architecture, this.name, description, imageId, imageLocation, imageOwnerId,
+                           imageState, rawState, imageType, imageOwnerAlias, isPublic, productCodes, kernelId, platform,
+                           ramdiskId, rootDeviceType, rootDeviceName, ebsBlockDevices, tags, virtualizationType,
+                           hypervisor));
             } catch (NullPointerException e) {
                logger.warn(e, "malformed image: %s", imageId);
             }

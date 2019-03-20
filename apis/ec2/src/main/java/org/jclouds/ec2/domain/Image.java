@@ -46,6 +46,8 @@ public class Image implements Comparable<Image> {
    private final ImageState imageState;
    private final String rawState;
    private final ImageType imageType;
+   @Nullable
+   private final String imageOwnerAlias;
    private final boolean isPublic;
    @Nullable
    private final String kernelId;
@@ -72,11 +74,11 @@ public class Image implements Comparable<Image> {
    }
 
    public Image(String region, Architecture architecture, @Nullable String name, @Nullable String description,
-            String imageId, String imageLocation, String imageOwnerId, ImageState imageState, String rawState,
-            ImageType imageType, boolean isPublic, Iterable<String> productCodes, @Nullable String kernelId,
-            @Nullable String platform, @Nullable String ramdiskId, RootDeviceType rootDeviceType,
-            @Nullable String rootDeviceName, Map<String, EbsBlockDevice> ebsBlockDevices,
-            Map<String, String> tags, VirtualizationType virtualizationType, Hypervisor hypervisor) {
+         String imageId, String imageLocation, String imageOwnerId, ImageState imageState, String rawState,
+         ImageType imageType, String imageOwnerAlias, boolean isPublic, Iterable<String> productCodes,
+         @Nullable String kernelId, @Nullable String platform, @Nullable String ramdiskId,
+         RootDeviceType rootDeviceType, @Nullable String rootDeviceName, Map<String, EbsBlockDevice> ebsBlockDevices,
+         Map<String, String> tags, VirtualizationType virtualizationType, Hypervisor hypervisor) {
       this.region = checkNotNull(region, "region");
       this.architecture = architecture;
       this.imageId = checkNotNull(imageId, "imageId");
@@ -88,6 +90,7 @@ public class Image implements Comparable<Image> {
       this.imageState = checkNotNull(imageState, "imageState");
       this.rawState = checkNotNull(rawState, "rawState");
       this.imageType = checkNotNull(imageType, "imageType");
+      this.imageOwnerAlias = imageOwnerAlias;
       this.isPublic = isPublic;
       this.kernelId = kernelId;
       this.platform = platform;
@@ -312,6 +315,13 @@ public class Image implements Comparable<Image> {
     */
    public ImageType getImageType() {
       return imageType;
+   }
+
+   /**
+    * The AWS account alias (for example, amazon, aws-marketplace, self) or the AWS account ID of the AMI owner.
+    */
+   public String getImageOwnerAlias() {
+      return imageOwnerAlias;
    }
 
    /**
