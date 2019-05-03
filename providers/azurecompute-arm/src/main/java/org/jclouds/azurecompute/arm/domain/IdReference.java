@@ -19,6 +19,7 @@ package org.jclouds.azurecompute.arm.domain;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.jclouds.azurecompute.arm.util.ResourceGroupInIdToLowerCase;
 import org.jclouds.javax.annotation.Nullable;
 import org.jclouds.json.SerializedNames;
 
@@ -46,9 +47,9 @@ public abstract class IdReference {
 
    @SerializedNames({"id"})
    public static IdReference create(final String id) {
-      return new AutoValue_IdReference(id);
+      return new AutoValue_IdReference(ResourceGroupInIdToLowerCase.apply(id));
    }
-   
+
    /**
     * Extracts the name from the given URI.
     */
@@ -66,6 +67,6 @@ public abstract class IdReference {
       if (uri == null)
          return null;
       Matcher m = RESOURCE_GROUP_PATTERN.matcher(uri);
-      return m.matches() ? m.group(1) : null;
+      return m.matches() ? m.group(1).toLowerCase() : null;
    }
 }

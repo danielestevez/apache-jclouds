@@ -18,6 +18,7 @@ package org.jclouds.azurecompute.arm.domain;
 
 import java.util.Map;
 
+import org.jclouds.azurecompute.arm.util.ResourceGroupInIdToLowerCase;
 import org.jclouds.javax.annotation.Nullable;
 import org.jclouds.json.SerializedNames;
 
@@ -91,11 +92,14 @@ public abstract class VirtualMachine {
       public abstract Builder properties(VirtualMachineProperties properties);
       public abstract Builder plan(Plan plan);
 
+      abstract String id();
+
       abstract Map<String, String> tags();
 
       abstract VirtualMachine autoBuild();
 
       public VirtualMachine build() {
+         id(ResourceGroupInIdToLowerCase.apply(id()));
          tags(tags() != null ? ImmutableMap.copyOf(tags()) : null);
          return autoBuild();
       }
